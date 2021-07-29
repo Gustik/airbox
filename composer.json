@@ -1,16 +1,13 @@
 {
-    "name": "yiisoft/yii2-app-advanced",
-    "description": "Yii 2 Advanced Project Template",
-    "keywords": ["yii2", "framework", "advanced", "project template"],
-    "homepage": "http://www.yiiframework.com/",
+    "name": "bbsoft/airbox",
+    "description": "Бэкэнд для автоматической камеры хранения",
+    "keywords": ["airport", "baggage", "room"],
+    "homepage": "https://bbgroup.pro/",
     "type": "project",
-    "license": "BSD-3-Clause",
+    "license": "commercial",
     "support": {
-        "issues": "https://github.com/yiisoft/yii2/issues?state=open",
-        "forum": "http://www.yiiframework.com/forum/",
-        "wiki": "http://www.yiiframework.com/wiki/",
-        "irc": "irc://irc.freenode.net/yii",
-        "source": "https://github.com/yiisoft/yii2"
+        "issues": "https://gitlab.com/bbsoft/airbox/-/issues",
+        "source": "https://gitlab.com/bbsoft/airbox"
     },
     "minimum-stability": "stable",
     "require": {
@@ -18,7 +15,9 @@
         "yiisoft/yii2": "~2.0.14",
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
-        "vlucas/phpdotenv": "^5.3"
+        "vlucas/phpdotenv": "^5.3",
+        "ramsey/uuid": "^4.1",
+        "beberlei/assert": "^3.3"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
