@@ -77,7 +77,7 @@ class CellService
         return $cell;
     }
 
-    public function unloadBaggage(Baggage $baggage)
+    public function unloadBaggage(string $cellId)
     {
         /*
         == Процедура выгрузки багажа
@@ -91,7 +91,12 @@ class CellService
             • Ячейка отмечается как свободная.
             • Клиент закрывает дверцу, электромагнитный замок запирается.
          */
-        return false;
+        $cell = $this->cells->get(new Id($cellId));
+        $cell->unloadBaggage();
+
+        foreach ($cell->releaseEvents() as $event) {
+            $this->dispatcher->dispatch($event);
+        }
     }
 
     public function unloadForgottenBaggage(Baggage $baggage)

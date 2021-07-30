@@ -16,8 +16,8 @@ class Cell implements AggregateRoot
     private string $name;
     private string $address;
 
-    private Baggage $baggage;
-    private DateTimeImmutable $startDate;
+    private ?Baggage $baggage;
+    private ?DateTimeImmutable $startDate;
     private int $daysCount;
 
     public string $pinCode;
@@ -38,7 +38,7 @@ class Cell implements AggregateRoot
         $this->address = $address;
     }
 
-    public function getBaggage(): Baggage
+    public function getBaggage(): ?Baggage
     {
         return $this->baggage;
     }
@@ -55,12 +55,25 @@ class Cell implements AggregateRoot
         return $this;
     }
 
-    public function getStartDate()
+    public function unloadBaggage()
+    {
+        $this->baggage = null;
+        $this->startDate = null;
+        $this->daysCount = 0;
+        $this->pinCode = '';
+    }
+
+    public function isBaggageLoaded(): bool
+    {
+        return $this->baggage ? true : false;
+    }
+
+    public function getStartDate(): ?DateTimeImmutable
     {
         return $this->startDate;
     }
 
-    public function getDaysCount()
+    public function getDaysCount(): int
     {
         return $this->daysCount;
     }
@@ -73,7 +86,7 @@ class Cell implements AggregateRoot
         return $this->pinCode;
     }
 
-    public function getId()
+    public function getId(): Id
     {
         return $this->id;
     }
