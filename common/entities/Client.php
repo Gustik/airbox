@@ -10,21 +10,18 @@ class Client
 {
     private Id $id;
     private DateTimeImmutable $date;
-    private Name $name;
     private Phone $phone;
 
     /**
      * Client constructor.
      * @param Id $id
      * @param DateTimeImmutable $date
-     * @param Name $name
      * @param Phone $phone
      */
-    public function __construct(Id $id, DateTimeImmutable $date, Name $name, Phone $phone)
+    public function __construct(Id $id, DateTimeImmutable $date, Phone $phone)
     {
         $this->id = $id;
         $this->date = $date;
-        $this->name = $name;
         $this->phone = $phone;
     }
 
@@ -44,13 +41,6 @@ class Client
         return $this->date;
     }
 
-    /**
-     * @return Name
-     */
-    public function getName(): Name
-    {
-        return $this->name;
-    }
 
     /**
      * @return Phone

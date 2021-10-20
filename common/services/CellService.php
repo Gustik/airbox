@@ -5,7 +5,6 @@ use common\entities\Baggage;
 use common\entities\Cell;
 use common\entities\Client;
 use common\entities\Id;
-use common\entities\Name;
 use common\entities\Phone;
 use common\repositories\BaggageRepository;
 use common\repositories\CellRepository;
@@ -59,14 +58,13 @@ class CellService
             $client = new Client(
                 $clientId = Id::next(),
                 $clientDate = new \DateTimeImmutable(),
-                $clientName = new Name($clientDto->lastName, $clientDto->firstName, $clientDto->middleName),
                 $clientPhone = new Phone($clientDto->phoneCountry, $clientDto->phoneCode, $clientDto->phoneNumber),
             )
         );
         $this->baggies->add($baggage);
 
         $cell = $this->cells->get(new Id($cellId));
-        $cell->loadBaggage($baggage, $startDate, $daysCount);
+        $cell->loadBaggage($baggage->getId(), $startDate, $daysCount);
 
         $this->cells->save($cell);
 
@@ -77,7 +75,7 @@ class CellService
         return $cell;
     }
 
-    public function unloadBaggage(string $cellId)
+    public function unloadBaggage(Id $cellId)
     {
         /*
         == Процедура выгрузки багажа
@@ -91,8 +89,14 @@ class CellService
             • Ячейка отмечается как свободная.
             • Клиент закрывает дверцу, электромагнитный замок запирается.
          */
-        $cell = $this->cells->get(new Id($cellId));
+        $cell = $this->cells->get($cellId);
+
+        $baggage = $this->baggies->get($cell->getBaggageId());
         $cell->unloadBaggage();
+        $this->cells->save($cell);
+
+        $baggage->unload();
+        $this->baggies->save($baggage);
 
         foreach ($cell->releaseEvents() as $event) {
             $this->dispatcher->dispatch($event);

@@ -5,6 +5,7 @@ namespace common\entities;
 
 
 use common\entities\events\BaggageLoadedEvent;
+use common\entities\events\BaggageUnloadedEvent;
 use DateTimeImmutable;
 
 class Cell implements AggregateRoot
@@ -16,7 +17,7 @@ class Cell implements AggregateRoot
     private string $name;
     private string $address;
 
-    private ?Baggage $baggage;
+    private ?Id $baggageId;
     private ?DateTimeImmutable $startDate;
     private int $daysCount;
 
@@ -38,14 +39,14 @@ class Cell implements AggregateRoot
         $this->address = $address;
     }
 
-    public function getBaggage(): ?Baggage
+    public function getBaggageId(): ?Id
     {
-        return $this->baggage;
+        return $this->baggageId;
     }
 
-    public function loadBaggage(Baggage $baggage, DateTimeImmutable $startDate, int $daysCount): Cell
+    public function loadBaggage(Id $baggageId, DateTimeImmutable $startDate, int $daysCount): Cell
     {
-        $this->baggage = $baggage;
+        $this->baggageId = $baggageId;
         $this->startDate = $startDate;
         $this->daysCount = $daysCount;
         $this->pinCode = uniqid();
@@ -57,15 +58,16 @@ class Cell implements AggregateRoot
 
     public function unloadBaggage()
     {
-        $this->baggage = null;
+        $this->baggageId = null;
         $this->startDate = null;
         $this->daysCount = 0;
         $this->pinCode = '';
+        $this->recordEvent(new BaggageUnloadedEvent($this->id));
     }
 
     public function isBaggageLoaded(): bool
     {
-        return $this->baggage ? true : false;
+        return $this->baggageId ? true : false;
     }
 
     public function getStartDate(): ?DateTimeImmutable

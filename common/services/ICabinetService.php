@@ -6,6 +6,6 @@ namespace common\services;
 
 interface ICabinetService
 {
-    public function openCell(string $cabinetAddress, string $cellAddress): bool;
-    public function closeCell(string $cabinetAddress, string $cellAddress): bool;
+    public function openCell(string $cellAddress): bool;
+    public function stateCell(string $cellAddress): array;
 }
