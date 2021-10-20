@@ -2,14 +2,15 @@
 namespace common\services;
 
 use common\entities\Baggage;
+use common\entities\Cabinet;
 use common\entities\Cell;
 use common\entities\Client;
 use common\entities\Id;
 use common\entities\Phone;
 use common\repositories\BaggageRepository;
 use common\repositories\CellRepository;
+use common\services\dto\CreateCellDto;
 use common\services\dto\CreateClientDto;
-use common\services\dto\LoadBaggageDto;
 use DateTimeImmutable;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -26,18 +27,44 @@ class CellService
         $this->dispatcher = $dispatcher;
     }
 
+    public function createCell(CreateCellDto $cellDto)
+    {
+        $cell = new Cell(
+            $this->cellId = Id::next(),
+            $cabinet = new Cabinet(
+                $cabinetId = new Id('1'),
+                $cabinetName = "Шкаф №1",
+                $cabinetAddress = "001"
+            ),
+            $cellName = $cellDto->cellName,
+            $cellAddress = $cellDto->cellAddress
+        );
+        $this->cells->add($cell);
+        return $cell;
+    }
+
+    public function getCell(Id $id): Cell
+    {
+        return $this->cells->get($id);
+    }
+
+    public function getBaggage(Id $id): Baggage
+    {
+        return $this->baggies->get($id);
+    }
+
     /**
      *
      * Процедура загрузки багажа
      *
      * @param CreateClientDto $clientDto
-     * @param string $cellId
+     * @param Id $cellId
      * @param DateTimeImmutable $startDate
      * @param int $daysCount
      * @return Cell
      * @throws \Assert\AssertionFailedException
      */
-    public function loadBaggage(CreateClientDto $clientDto, string $cellId, DateTimeImmutable $startDate, int $daysCount): Cell
+    public function loadBaggage(CreateClientDto $clientDto, Id $cellId, DateTimeImmutable $startDate, int $daysCount): Cell
     {
         /*
         == Процедура загрузки багажа
@@ -63,7 +90,7 @@ class CellService
         );
         $this->baggies->add($baggage);
 
-        $cell = $this->cells->get(new Id($cellId));
+        $cell = $this->cells->get($cellId);
         $cell->loadBaggage($baggage->getId(), $startDate, $daysCount);
 
         $this->cells->save($cell);

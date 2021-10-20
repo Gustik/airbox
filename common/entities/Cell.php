@@ -21,7 +21,7 @@ class Cell implements AggregateRoot
     private ?DateTimeImmutable $startDate;
     private int $daysCount;
 
-    public string $pinCode;
+    private string $pinCode;
 
 
     /**

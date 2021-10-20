@@ -7,58 +7,47 @@ use Codeception\Test\Unit;
 use Codeception\Util\Debug;
 use common\dispatchers\DummyDispatcher;
 use common\entities\BaggageStatus;
-use common\entities\Cabinet;
 use common\entities\Cell;
-use common\entities\Id;
 use common\repositories\MemoryBaggageRepository;
 use common\repositories\MemoryCellsRepository;
 use common\services\CellService;
+use common\services\dto\CreateCellDto;
 use common\services\dto\CreateClientDto;
 use DateTimeImmutable;
 
 
-class BaggageLoadingTest extends Unit
+class BaggageTest extends Unit
 {
-    public MemoryCellsRepository $cells;
     public CellService $cellService;
-    public MemoryBaggageRepository $baggies;
 
     private function loadCell(): Cell
     {
-        $this->cells = new MemoryCellsRepository();
-        $cell = new Cell(
-            $cellId = Id::next(),
-            $cabinet = new Cabinet(
-                $cabinetId = Id::next(),
-                $cabinetName = "Шкаф №1",
-                $cabinetAddress = "001"
-            ),
-            $cellName = "Ячейка №15",
-            $cellAddress = "0015"
-        );
-        $this->cells->add($cell);
-
         $this->cellService = new CellService(
-            $this->cells,
-            $this->baggies = new MemoryBaggageRepository(),
+            new MemoryCellsRepository(),
+            new MemoryBaggageRepository(),
             new DummyDispatcher()
         );
+
+        $createCellDto = new CreateCellDto();
+        $createCellDto->cellName = "#1";
+        $createCellDto->cellAddress = "1";
+        $cell = $this->cellService->createCell($createCellDto);
 
         $clientDto = new CreateClientDto();
         $clientDto->phoneCountry = 7;
         $clientDto->phoneCode = '920';
         $clientDto->phoneNumber = '00000001';
 
-        $this->cellService->loadBaggage($clientDto, $cellId->getId(), $startDate = new DateTimeImmutable, $daysCount = 42);
+        $this->cellService->loadBaggage($clientDto, $cell->getId(), $startDate = new DateTimeImmutable, $daysCount = 42);
 
-        $loadedCell = $this->cells->get($cellId);
+        $loadedCell = $this->cellService->getCell($cell->getId());
 
         $this->assertNotNull($loadedCell->getBaggageId());
         $this->assertNotNull($loadedCell->getPinCode());
         $this->assertEquals($loadedCell->getStartDate(), $startDate);
         $this->assertEquals($loadedCell->getDaysCount(), $daysCount);
 
-        $baggage = $this->baggies->get($loadedCell->getBaggageId());
+        $baggage = $this->cellService->getBaggage($loadedCell->getBaggageId());
         $this->assertNotNull($baggage);
         $this->assertEquals($baggage->getStatus(), BaggageStatus::Loaded);
         $this->assertNotNull($baggage->getClient());
@@ -84,14 +73,14 @@ class BaggageLoadingTest extends Unit
         $baggageId = $cell->getBaggageId();
 
         $this->cellService->unloadBaggage($cell->getId());
-        $cell = $this->cells->get($cell->getId());
+        $cell = $this->cellService->getCell($cell->getId());
 
         $this->assertNull($cell->getBaggageId());
         $this->assertNull($cell->getStartDate());
         $this->assertEquals($cell->getDaysCount(), 0);
         $this->assertEquals($cell->getPinCode(), '');
 
-        $baggage = $this->baggies->get($baggageId);
+        $baggage = $this->cellService->getBaggage($baggageId);
         $this->assertEquals($baggage->getStatus(), BaggageStatus::Unloaded);
     }
 
