@@ -4,6 +4,8 @@ docker-compose build
 docker-compose run --rm backend composer install
 docker-compose run --rm backend init
 cp env.example .env
+docker-compose up -d
+docker-compose run --rm backend yii migrate
 ```
 
 #### Запуск тестов
@@ -13,7 +15,7 @@ docker-compose run --rm backend vendor/bin/codecept run unit services -c common
 
 #### Запуск всего
 ```
-docker-compose up
+docker-compose up -d
 ```
 
 #### Частичный запуск
