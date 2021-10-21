@@ -38,7 +38,7 @@ class CellService
             ),
             $cellName = $cellDto->cellName,
             $cellAddress = $cellDto->cellAddress,
-            $cellDto->daysCount,
+            0,
             $cellDto->price,
         );
         $this->cells->add($cell);

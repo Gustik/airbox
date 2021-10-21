@@ -9,6 +9,7 @@ use common\entities\events\BaggageUnloadedEvent;
 use common\entities\events\CellLockedEvent;
 use common\entities\events\CellReservedEvent;
 use common\entities\events\CellUnlockedEvent;
+use common\services\dto\CreateCellDto;
 use DateTimeImmutable;
 
 class Cell implements AggregateRoot
@@ -47,6 +48,19 @@ class Cell implements AggregateRoot
         $this->status = CellStatus::Unlocked;
         $this->daysCount = $daysCount;
         $this->price = $price;
+    }
+
+    public function dto(): CreateCellDto
+    {
+        $dto = new CreateCellDto();
+        $dto->cellId = $this->getId();
+        $dto->cellName = $this->getName();
+        $dto->cellAddress = $this->getAddress();
+        $dto->price = $this->getPrice();
+        $dto->daysCount = $this->getDaysCount();
+        $dto->status = $this->getStatus();
+        $dto->busy = $this->isBusy();
+        return $dto;
     }
 
     public function getBaggageId(): ?Id

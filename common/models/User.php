@@ -29,6 +29,13 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_ACTIVE = 10;
 
 
+    public static $statuses = [
+        self::STATUS_INACTIVE => 'Не активный',
+        self::STATUS_ACTIVE => 'Активный',
+    ];
+
+
+
     /**
      * {@inheritdoc}
      */
@@ -57,6 +64,26 @@ class User extends ActiveRecord implements IdentityInterface
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'username' => 'Логин',
+            'password_hash' => 'Хэш пароля',
+            'password_reset_token' => 'Токен восстановления пароля',
+            'email' => 'E-mail',
+            'auth_key' => 'Auth Key',
+            'status' => 'Статус',
+            'created_at' => 'Создан',
+            'updated_at' => 'Обновлен',
+            'password' => 'Пароль',
+        ];
+    }
+
 
     /**
      * {@inheritdoc}
@@ -209,4 +236,10 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
+
+    public function getStatusString()
+    {
+        return static::$statuses[$this->status];
+    }
+
 }
