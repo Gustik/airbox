@@ -4,10 +4,10 @@
 namespace unit\services;
 
 use Codeception\Test\Unit;
-use Codeception\Util\Debug;
 use common\dispatchers\DummyDispatcher;
 use common\entities\BaggageStatus;
 use common\entities\Cell;
+use common\entities\CellStatus;
 use common\repositories\MemoryBaggageRepository;
 use common\repositories\MemoryCellsRepository;
 use common\services\CellService;
@@ -20,18 +20,30 @@ class BaggageTest extends Unit
 {
     public CellService $cellService;
 
-    private function loadCell(): Cell
+    protected function _before()
     {
         $this->cellService = new CellService(
             new MemoryCellsRepository(),
             new MemoryBaggageRepository(),
             new DummyDispatcher()
         );
+        parent::_before();
+    }
 
+    private function createCell(): Cell
+    {
         $createCellDto = new CreateCellDto();
         $createCellDto->cellName = "#1";
         $createCellDto->cellAddress = "1";
-        $cell = $this->cellService->createCell($createCellDto);
+        $createCellDto->daysCount = 42;
+        $createCellDto->price = 142;
+
+        return $this->cellService->createCell($createCellDto);
+    }
+
+    private function loadCell(): Cell
+    {
+        $cell = $this->createCell();
 
         $clientDto = new CreateClientDto();
         $clientDto->phoneCountry = 7;
@@ -58,7 +70,6 @@ class BaggageTest extends Unit
         $this->assertEquals($client->getPhone()->getCode(), $clientDto->phoneCode);
         $this->assertEquals($client->getPhone()->getNumber(), $clientDto->phoneNumber);
 
-
         return $loadedCell;
     }
 
@@ -84,4 +95,28 @@ class BaggageTest extends Unit
         $this->assertEquals($baggage->getStatus(), BaggageStatus::Unloaded);
     }
 
+    public function testReserveCell(): void
+    {
+        $cell = $this->createCell();
+        $cell = $this->cellService->reserveCell($cell);
+        $this->assertEquals($cell->getStatus(), CellStatus::Reserved);
+    }
+
+    public function testReserveReservedCell(): void
+    {
+        $cell = $this->createCell();
+        $cell = $this->cellService->reserveCell($cell);
+        $this->expectException(\DomainException::class);
+        $this->cellService->reserveCell($cell);
+    }
+
+    public function testListCellDto()
+    {
+        $cell = $this->createCell();
+        $this->createCell();
+        $cell2 = $this->createCell();
+        $cellsDto = $this->cellService->cellListDto();
+        $this->assertEquals($cellsDto[0]->cellName, $cell->getName());
+        $this->assertEquals($cellsDto[2]->cellName, $cell2->getName());
+    }
 }

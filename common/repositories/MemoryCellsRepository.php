@@ -6,7 +6,12 @@ use common\entities\Id;
 
 class MemoryCellsRepository implements CellRepository
 {
-    private $items = [];
+    private array $items = [];
+
+    public function all(): array
+    {
+        return $this->items;
+    }
 
     public function get(Id $id): Cell
     {

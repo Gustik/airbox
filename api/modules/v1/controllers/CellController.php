@@ -4,11 +4,8 @@
 namespace api\modules\v1\controllers;
 
 
-use Assert\AssertionFailedException;
-use common\entities\Cabinet;
 use common\entities\Cell;
 use common\entities\Id;
-use common\repositories\MemoryCellsRepository;
 use common\services\CellService;
 use common\services\dto\CreateCellDto;
 use common\services\dto\CreateClientDto;
@@ -24,22 +21,60 @@ class CellController extends \yii\rest\Controller
         parent::__construct($id, $module, $config);
     }
 
-    function actionLoad()
+    public function behaviors()
+    {
+        return [
+            'corsFilter' => [
+                'class' => \yii\filters\Cors::class,
+                'cors' => [
+                    'Origin' => ['*'],
+                ]
+            ],
+        ];
+    }
+
+    private function createCell($name, $address): Cell
     {
         $createCellDto = new CreateCellDto();
-        $createCellDto->cellName = "#1";
-        $createCellDto->cellAddress = "1";
-        $cell = $this->cellService->createCell($createCellDto);
+        $createCellDto->cellName = $name;
+        $createCellDto->cellAddress = $address;
+        $createCellDto->daysCount = 2;
+        $createCellDto->price = 100;
 
+        return $this->cellService->createCell($createCellDto);
+    }
+
+    /**
+     * @param $cellId
+     *
+     * Зарезервировать ячейку
+     * @return array
+     */
+    function actionReserve($cellId)
+    {
+        $cell = $this->cellService->getCell(new Id($cellId));
+        $this->cellService->reserveCell($cell);
+
+        return ['status' => 0];
+    }
+
+    function actionLoad($cellId, $phone, $days)
+    {
         $clientDto = new CreateClientDto();
-        $clientDto->phoneCountry = 7;
-        $clientDto->phoneCode = '920';
-        $clientDto->phoneNumber = '00000001';
+        $clientDto->phoneCountry = substr($phone, 0, 1);
+        $clientDto->phoneCode = substr($phone, 1, 3);
+        $clientDto->phoneNumber = substr($phone, 3);
 
+        $cell = $this->cellService->loadBaggage($clientDto, new Id($cellId), new DateTimeImmutable, $days);
 
-        $cell = $this->cellService->loadBaggage($clientDto, $cell->getId(), $startDate = new DateTimeImmutable, $daysCount = 42);
+        return ['status' => 0];
+    }
 
-
-        return ['result' => $cell->getPinCode()];
+    public function actionList()
+    {
+        for($i = 1; $i < 21; $i++) {
+            $this->createCell("{$i}", "xx{$i}");
+        }
+        return [ 'cells' => $this->cellService->cellListDto()];
     }
 }

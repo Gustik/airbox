@@ -37,7 +37,9 @@ class CellService
                 $cabinetAddress = "001"
             ),
             $cellName = $cellDto->cellName,
-            $cellAddress = $cellDto->cellAddress
+            $cellAddress = $cellDto->cellAddress,
+            $cellDto->daysCount,
+            $cellDto->price,
         );
         $this->cells->add($cell);
         return $cell;
@@ -156,5 +158,40 @@ class CellService
     {
         /* Система должна иметь режим работы для служб безопасности */
         return false;
+    }
+
+    /**
+     * @param Cell $cell
+     * @return Cell
+     * @throws \DomainException
+     */
+    public function reserveCell(Cell $cell): Cell
+    {
+        if($cell->isReserved()) {
+            throw new \DomainException('Cell is all ready reserved.');
+        }
+        $cell->reserve();
+        foreach ($cell->releaseEvents() as $event) {
+            $this->dispatcher->dispatch($event);
+        }
+
+        return $cell;
+    }
+
+    public function cellListDto(): array
+    {
+        $cells = [];
+
+        foreach ($this->cells->all() as $cell) {
+            $cellDto = new CreateCellDto();
+            $cellDto->cellId = $cell->getId()->getId();
+            $cellDto->cellName = $cell->getName();
+            $cellDto->cellAddress = $cell->getAddress();
+            $cellDto->status = $cell->getStatus();
+            $cellDto->busy = $cell->isBusy();
+            $cellDto->price = $cell->getPrice();
+            $cells[] = $cellDto;
+        }
+        return $cells;
     }
 }
