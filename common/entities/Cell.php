@@ -17,7 +17,6 @@ class Cell implements AggregateRoot
     use EventTrait;
 
     private Id $id;
-    private Cabinet $cabinet;
     private string $name;
     private string $address;
     private int $status;
@@ -33,27 +32,28 @@ class Cell implements AggregateRoot
     /**
      * Cell constructor.
      * @param Id $id
-     * @param Cabinet $cabinet
      * @param string $name
      * @param string $address
      * @param int $daysCount
      * @param int $price
      */
-    public function __construct(Id $id, Cabinet $cabinet, string $name, string $address, int $daysCount, int $price)
+    public function __construct(Id $id, string $name, string $address, int $daysCount, int $price)
     {
         $this->id = $id;
-        $this->cabinet = $cabinet;
         $this->name = $name;
         $this->address = $address;
         $this->status = CellStatus::Unlocked;
         $this->daysCount = $daysCount;
         $this->price = $price;
+        $this->baggageId = null;
+        $this->startDate = null;
+        $this->pinCode = '';
     }
 
     public function dto(): CreateCellDto
     {
         $dto = new CreateCellDto();
-        $dto->cellId = $this->getId();
+        $dto->cellId = $this->getId()->getId();
         $dto->cellName = $this->getName();
         $dto->cellAddress = $this->getAddress();
         $dto->price = $this->getPrice();

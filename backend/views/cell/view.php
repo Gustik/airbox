@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $cell \common\services\dto\CreateCellDto */
 
-$this->title = $cell->cellName;
+$this->title = 'Ячейка №' . $cell->cellName;
 $this->params['breadcrumbs'][] = ['label' => 'Ячейки', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -16,8 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div>
-        <?=$cell->cellName?><br>
-        <?=$cell->cellAddress?><br>
+        Номер ячейки: <?=$cell->cellName?><br>
+        Адрес ячейки: <?=$cell->cellAddress?><br>
+        Статус: <?=$cell->status?><br>
     </div>
 
 </div>

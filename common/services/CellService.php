@@ -31,11 +31,6 @@ class CellService
     {
         $cell = new Cell(
             $this->cellId = Id::next(),
-            $cabinet = new Cabinet(
-                $cabinetId = new Id('1'),
-                $cabinetName = "Шкаф №1",
-                $cabinetAddress = "001"
-            ),
             $cellName = $cellDto->cellName,
             $cellAddress = $cellDto->cellAddress,
             0,

@@ -37,10 +37,6 @@ class CellController extends \yii\web\Controller
 
     public function actionIndex()
     {
-        for($i = 1; $i < 21; $i++) {
-            $this->createCell("{$i}", "xx{$i}");
-        }
-
         return $this->render('index', [ 'cells' => $this->cellService->cellListDto()]);
     }
 
@@ -64,6 +60,7 @@ class CellController extends \yii\web\Controller
 
     public function actionView($id)
     {
+        //die($id);
         $cell = $this->cellService->getCell(new Id($id));
 
         return $this->render('view', [

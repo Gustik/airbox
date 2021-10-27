@@ -8,24 +8,18 @@ use yii\db\Query;
 
 class SqlCellsRepository implements CellRepository
 {
-    private $db;
-    private $hydrator;
-    private $lazyFactory;
+    private Connection $db;
+    private Hydrator $hydrator;
 
-    public function __construct(
-        Connection $db,
-        Hydrator $hydrator,
-        LazyLoadingValueHolderFactory $lazyFactory
-    )
+    public function __construct(Connection $db, Hydrator $hydrator)
     {
         $this->db = $db;
         $this->hydrator = $hydrator;
-        $this->lazyFactory = $lazyFactory;
     }
 
     /**
      * @param Id $id
-     * @return Employee|object
+     * @return Cell|object
      * @throws \Exception
      */
     public function get(Id $id): Cell
@@ -36,131 +30,104 @@ class SqlCellsRepository implements CellRepository
             ->one($this->db);
 
         if (!$cell) {
-            throw new NotFoundException('Employee not found.');
+            throw new NotFoundException('Cell not found.');
         }
 
-        return $this->hydrator->hydrate(Employee::class, [
+        return $this->hydrator->hydrate(Cell::class, [
             'id' => new Id($cell['id']),
-            'name' => new Name(
-                $cell['name_last'],
-                $cell['name_first'],
-                $cell['name_middle']
-            ),
-            'address' => new Address(
-                $cell['address_country'],
-                $cell['address_region'],
-                $cell['address_city'],
-                $cell['address_street'],
-                $cell['address_house']
-            ),
-            'createDate' => new \DateTimeImmutable($cell['create_date']),
-            'phones' => $this->lazyFactory->createProxy(
-                Phones::class,
-                function (&$target, LazyLoadingInterface $proxy) use ($id) {
-                    $phones = (new Query())->select('*')
-                        ->from('{{%sql_employee_phones}}')
-                        ->andWhere(['employee_id' => $id->getId()])
-                        ->orderBy('id')
-                        ->all($this->db);
-                    $target = new Phones(array_map(function ($phone) {
-                        return new Phone(
-                            $phone['country'],
-                            $phone['code'],
-                            $phone['number']
-                        );
-                    }, $phones));
-                    $proxy->setProxyInitializer(null);
-                }
-            ),
-            'statuses' => array_map(function ($status) {
-                return new Status(
-                    $status['value'],
-                    new \DateTimeImmutable($status['date'])
-                );
-            }, Json::decode($cell['statuses'])),
+            'name' => $cell['name'],
+            'address' => $cell['address'],
+            'status' => $cell['status'],
+            'baggageId' => $cell['baggageId'] ? new Id($cell['baggageId']) : null,
+            'startDate' => $cell['startDate'] ? new \DateTimeImmutable($cell['startDate']) : null,
+            'daysCount' => $cell['daysCount'],
+            'price' => $cell['price'],
+            'pinCode' => $cell['pinCode']
         ]);
     }
 
-    public function add(Employee $employee): void
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function all(): array
     {
-        $this->db->transaction(function () use ($employee) {
+        $cells = (new Query())->select('*')->from('{{%cell}}')->orderBy('name')->all($this->db);
+        $arrCells = [];
+        foreach ($cells as $cell) {
+            $arrCells[] = $this->hydrator->hydrate(Cell::class, [
+                'id' => new Id($cell['id']),
+                'name' => $cell['name'],
+                'address' => $cell['address'],
+                'status' => $cell['status'],
+                'baggageId' => $cell['baggageId'] ? new Id($cell['baggageId']) : null,
+                'startDate' => $cell['startDate'] ? new \DateTimeImmutable($cell['startDate']) : null,
+                'daysCount' => $cell['daysCount'],
+                'price' => $cell['price'],
+                'pinCode' => $cell['pinCode']
+            ]);
+        }
+
+        return $arrCells;
+    }
+
+    /**
+     * @param Cell $cell
+     * @throws \Throwable
+     */
+    public function add(Cell $cell): void
+    {
+        $this->db->transaction(function () use ($cell) {
             $this->db->createCommand()
-                ->insert('{{%sql_employees}}', self::extractEmployeeData($employee))
+                ->insert('{{%cell}}', self::extractCellData($cell))
                 ->execute();
-            $this->updatePhones($employee);
         });
     }
 
-    public function save(Employee $employee): void
+    /**
+     * @param Cell $cell
+     * @throws \Throwable
+     */
+    public function save(Cell $cell): void
     {
-        $this->db->transaction(function () use ($employee) {
+        $this->db->transaction(function () use ($cell) {
             $this->db->createCommand()
                 ->update(
-                    '{{%sql_employees}}',
-                    self::extractEmployeeData($employee),
-                    ['id' => $employee->getId()->getId()]
+                    '{{%cell}}',
+                    self::extractCellData($cell),
+                    ['id' => $cell->getId()->getId()]
                 )->execute();
-            $this->updatePhones($employee);
         });
     }
 
-    public function remove(Employee $employee): void
+    /**
+     * @param Cell $cell
+     * @throws \yii\db\Exception
+     */
+    public function remove(Cell $cell): void
     {
         $this->db->createCommand()
-            ->delete('{{%sql_employees}}', ['id' => $employee->getId()->getId()])
+            ->delete('{{%cell}}', ['id' => $cell->getId()->getId()])
             ->execute();
     }
 
-    private static function extractEmployeeData(Employee $employee)
+    /**
+     * @param Cell $cell
+     * @return array
+     */
+    private static function extractCellData(Cell $cell)
     {
-        $statuses = $employee->getStatuses();
 
         return [
-            'id' => $employee->getId()->getId(),
-            'create_date' => $employee->getCreateDate()->format('Y-m-d H:i:s'),
-            'name_last' => $employee->getName()->getLast(),
-            'name_middle' => $employee->getName()->getMiddle(),
-            'name_first' => $employee->getName()->getFirst(),
-            'address_country' => $employee->getAddress()->getCountry(),
-            'address_region' => $employee->getAddress()->getRegion(),
-            'address_city' => $employee->getAddress()->getCity(),
-            'address_street' => $employee->getAddress()->getStreet(),
-            'address_house' => $employee->getAddress()->getHouse(),
-            'current_status' => end($statuses)->getValue(),
-            'statuses' => Json::encode(array_map(function (Status $status) {
-                return [
-                    'value' => $status->getValue(),
-                    'date' => $status->getDate()->format(DATE_RFC3339),
-                ];
-            }, $employee->getStatuses())),
+            'id' => $cell->getId()->getId(),
+            'name' => $cell->getName(),
+            'address' => $cell->getAddress(),
+            'status' => $cell->getStatus(),
+            'baggageId' => $cell->getBaggageId() ? $cell->getBaggageId()->getId() : null,
+            'startDate' => $cell->getStartDate() ? $cell->getStartDate()->format('Y-m-d H:i:s') : null,
+            'daysCount' => $cell->getDaysCount(),
+            'price' => $cell->getPrice(),
+            'pinCode' => $cell->getPinCode(),
         ];
-    }
-
-    private function updatePhones(Employee $employee)
-    {
-        $data = $this->hydrator->extract($employee, ['phones']);
-        $phones = $data['phones'];
-
-        if ($phones instanceOf LazyLoadingInterface && !$phones->isProxyInitialized()) {
-            return;
-        }
-
-        $this->db->createCommand()
-            ->delete('{{%sql_employee_phones}}', ['employee_id' => $employee->getId()->getId()])
-            ->execute();
-
-        if ($employee->getPhones()) {
-            $this->db->createCommand()
-                ->batchInsert('{{%sql_employee_phones}}', ['employee_id', 'country', 'code', 'number'],
-                    array_map(function (Phone $phone) use ($employee) {
-                        return [
-                            'employee_id' => $employee->getId()->getId(),
-                            'country' => $phone->getCountry(),
-                            'code' => $phone->getCode(),
-                            'number' => $phone->getNumber(),
-                        ];
-                    }, $employee->getPhones()))
-                ->execute();
-        }
     }
 }

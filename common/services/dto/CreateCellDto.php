@@ -28,16 +28,11 @@ class CreateCellDto
     public function setAttributes($values): bool
     {
         if (is_array($values)) {
-            echo "<pre>";
-            var_dump($values);
-            die("========");
             foreach ($values as $name => $value) {
-                echo $name + "<br>";
                 if(isset($this->$name)) {
                     $this->$name = $value;
                 }
             }
-           // die("============");
 
             return true;
         }
