@@ -15,6 +15,9 @@ docker-compose run --rm backend bash
 
 #### Запуск тестов
 ```
+docker-compose up -d
+docker-compose run --rm mysql mysql -u root -h mysql -p -e "create database airbox_test";
+docker-compose run --rm backend yii_test migrate
 docker-compose run --rm backend vendor/bin/codecept run unit services -c common
 docker-compose run --rm backend vendor/bin/codecept run unit repositories -c common
 ```

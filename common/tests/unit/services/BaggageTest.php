@@ -1,7 +1,7 @@
 <?php
 
 
-namespace unit\services;
+namespace common\tests\unit\services;
 
 use Codeception\Test\Unit;
 use common\dispatchers\DummyDispatcher;
