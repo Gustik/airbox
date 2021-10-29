@@ -2,7 +2,6 @@
 namespace common\services;
 
 use common\entities\Baggage;
-use common\entities\Cabinet;
 use common\entities\Cell;
 use common\entities\Client;
 use common\entities\Id;

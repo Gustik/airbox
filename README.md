@@ -16,6 +16,7 @@ docker-compose run --rm backend bash
 #### Запуск тестов
 ```
 docker-compose run --rm backend vendor/bin/codecept run unit services -c common
+docker-compose run --rm backend vendor/bin/codecept run unit repositories -c common
 ```
 
 #### Запуск всего
