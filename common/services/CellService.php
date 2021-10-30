@@ -3,6 +3,7 @@ namespace common\services;
 
 use common\entities\Baggage;
 use common\entities\Cell;
+use common\entities\CellStatus;
 use common\entities\Client;
 use common\entities\Id;
 use common\entities\Phone;
@@ -92,6 +93,8 @@ class CellService
         $this->baggies->add($baggage);
 
         $cell = $this->cells->get($cellId);
+        if($cell->getStatus() !== CellStatus::Reserved) throw new \DomainException('Cell is not reserved');
+
         $cell->loadBaggage($baggage->getId(), $startDate, $daysCount);
 
         $this->cells->save($cell);

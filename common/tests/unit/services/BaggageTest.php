@@ -44,6 +44,7 @@ class BaggageTest extends Unit
     private function loadCell(): Cell
     {
         $cell = $this->createCell();
+        $cell = $this->cellService->reserveCell($cell);
 
         $clientDto = new CreateClientDto();
         $clientDto->phoneCountry = 7;

@@ -4,6 +4,7 @@
 namespace api\modules\v1\controllers;
 
 
+use Assert\AssertionFailedException;
 use common\entities\Cell;
 use common\entities\Id;
 use common\services\CellService;
@@ -55,7 +56,7 @@ class CellController extends \yii\rest\Controller
         $cell = $this->cellService->getCell(new Id($cellId));
         $this->cellService->reserveCell($cell);
 
-        return ['status' => 0];
+        return ['status' => 200];
     }
 
     function actionLoad($cellId, $phone, $days)
@@ -65,9 +66,13 @@ class CellController extends \yii\rest\Controller
         $clientDto->phoneCode = substr($phone, 1, 3);
         $clientDto->phoneNumber = substr($phone, 3);
 
-        $cell = $this->cellService->loadBaggage($clientDto, new Id($cellId), new DateTimeImmutable, $days);
+        try {
+            $cell = $this->cellService->loadBaggage($clientDto, new Id($cellId), new DateTimeImmutable, $days);
+        } catch (\Exception $e) {
+            return ['status'=>500, 'error' => $e->getMessage()];
+        }
 
-        return ['status' => 0];
+        return ['status' => 200];
     }
 
     public function actionList()
