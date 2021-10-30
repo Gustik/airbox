@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
         Номер ячейки: <?=$cell->cellName?><br>
         Адрес ячейки: <?=$cell->cellAddress?><br>
         Статус: <?=$cell->status?><br>
+        Цена: <?=$cell->price?><br>
     </div>
 
 </div>

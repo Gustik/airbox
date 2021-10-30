@@ -17,24 +17,6 @@ class CellController extends \yii\web\Controller
         parent::__construct($id, $module, $config);
     }
 
-    /**
-     * @param $name
-     * @param $address
-     * @return Cell
-     *
-     * Для тестов
-     */
-    private function createCell($name, $address): Cell
-    {
-        $createCellDto = new CreateCellDto();
-        $createCellDto->cellName = $name;
-        $createCellDto->cellAddress = $address;
-        $createCellDto->daysCount = 2;
-        $createCellDto->price = 100;
-
-        return $this->cellService->createCell($createCellDto);
-    }
-
     public function actionIndex()
     {
         return $this->render('index', [ 'cells' => $this->cellService->cellListDto()]);
