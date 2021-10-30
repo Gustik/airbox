@@ -33,17 +33,7 @@ class SqlCellsRepository implements CellRepository
             throw new NotFoundException('Cell not found.');
         }
 
-        return $this->hydrator->hydrate(Cell::class, [
-            'id' => new Id($cell['id']),
-            'name' => $cell['name'],
-            'address' => $cell['address'],
-            'status' => $cell['status'],
-            'baggageId' => $cell['baggageId'] ? new Id($cell['baggageId']) : null,
-            'startDate' => $cell['startDate'] ? new \DateTimeImmutable($cell['startDate']) : null,
-            'daysCount' => $cell['daysCount'],
-            'price' => $cell['price'],
-            'pinCode' => $cell['pinCode']
-        ]);
+        return $this->hydrateCellData($cell);
     }
 
     /**
@@ -52,20 +42,10 @@ class SqlCellsRepository implements CellRepository
      */
     public function all(): array
     {
-        $cells = (new Query())->select('*')->from('{{%cell}}')->orderBy('name')->all($this->db);
+        $cells = (new Query())->select('*')->from('{{%cell}}')->orderBy('CAST(name AS DECIMAL)')->all($this->db);
         $arrCells = [];
         foreach ($cells as $cell) {
-            $arrCells[] = $this->hydrator->hydrate(Cell::class, [
-                'id' => new Id($cell['id']),
-                'name' => $cell['name'],
-                'address' => $cell['address'],
-                'status' => $cell['status'],
-                'baggageId' => $cell['baggageId'] ? new Id($cell['baggageId']) : null,
-                'startDate' => $cell['startDate'] ? new \DateTimeImmutable($cell['startDate']) : null,
-                'daysCount' => $cell['daysCount'],
-                'price' => $cell['price'],
-                'pinCode' => $cell['pinCode']
-            ]);
+            $arrCells[] = $this->hydrateCellData($cell);
         }
 
         return $arrCells;
@@ -129,5 +109,25 @@ class SqlCellsRepository implements CellRepository
             'price' => $cell->getPrice(),
             'pinCode' => $cell->getPinCode(),
         ];
+    }
+
+    /**
+     * @param $cell
+     * @return Cell|object
+     * @throws \ReflectionException
+     */
+    private function hydrateCellData($cell): Cell
+    {
+        return $this->hydrator->hydrate(Cell::class, [
+            'id' => new Id($cell['id']),
+            'name' => $cell['name'],
+            'address' => $cell['address'],
+            'status' => $cell['status'],
+            'baggageId' => $cell['baggageId'] ? new Id($cell['baggageId']) : null,
+            'startDate' => $cell['startDate'] ? new \DateTimeImmutable($cell['startDate']) : null,
+            'daysCount' => $cell['daysCount'],
+            'price' => $cell['price'],
+            'pinCode' => $cell['pinCode']
+        ]);
     }
 }

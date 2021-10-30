@@ -26,8 +26,6 @@ class CellController extends \yii\web\Controller
     {
         $errors = [];
         $dto = new CreateCellDto();
-        //var_dump(\Yii::$app->request->post());
-        //die();
         if(\Yii::$app->request->post() && $dto->load(\Yii::$app->request->post()) ) {
             try {
                 $cell = $this->cellService->createCell($dto);
@@ -42,11 +40,17 @@ class CellController extends \yii\web\Controller
 
     public function actionView($id)
     {
-        //die($id);
         $cell = $this->cellService->getCell(new Id($id));
 
         return $this->render('view', [
             'cell' => $cell->dto()
         ]);
+    }
+
+    public function actionDelete($id)
+    {
+        $this->cellService->deleteCell(new Id($id));
+
+        return $this->redirect(['index']);
     }
 }

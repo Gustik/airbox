@@ -14,11 +14,19 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="cell-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
+    <p>
+        <?= Html::a('Удалить', ['delete', 'id' => $cell->cellId], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => 'Вы уверены что хотите удалить эту ячейку?',
+                'method' => 'post',
+            ],
+        ]) ?>
+    </p>
     <div>
         Номер ячейки: <?=$cell->cellName?><br>
         Адрес ячейки: <?=$cell->cellAddress?><br>
-        Статус: <?=$cell->status?><br>
+        Статус: <?=\common\entities\CellStatus::name($cell->status)?><br>
         Цена: <?=$cell->price?><br>
     </div>
 

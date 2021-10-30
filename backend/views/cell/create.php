@@ -12,11 +12,16 @@ use yii\helpers\Html; ?>
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="cell-form">
-        <?php var_dump($errors) ?>
+        <?php foreach ($errors as $error): ?>
+            <div class="alert alert-danger">
+            <?= $error ?>
+            </div>
+        <?php endforeach ?>
         <?= Html::beginForm(['create'], 'POST'); ?>
-        <?= Html::input('text', 'cellName') ?>
-        <?= Html::input('text', 'cellAddress') ?>
-        <?= Html::input('text', 'price') ?>
+
+        <?= Html::input('text', 'cellName', null, ['class' => 'form-control', 'placeholder'=>"Имя ячейки"]) ?>
+        <?= Html::input('text', 'cellAddress', null, ['class' => 'form-control', 'placeholder'=>"Адрес ячейки"]) ?>
+        <?= Html::input('text', 'price', null, ['class' => 'form-control', 'placeholder'=>"Цена за сутки"]) ?>
 
         <div class="form-group">
             <?= Html::submitButton('Добавить', ['class' => 'btn btn-primary']); ?>

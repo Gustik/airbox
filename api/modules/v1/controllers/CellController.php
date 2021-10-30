@@ -72,9 +72,6 @@ class CellController extends \yii\rest\Controller
 
     public function actionList()
     {
-        for($i = 1; $i < 21; $i++) {
-            $this->createCell("{$i}", "xx{$i}");
-        }
         return [ 'cells' => $this->cellService->cellListDto()];
     }
 }

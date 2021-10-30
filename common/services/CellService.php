@@ -44,6 +44,11 @@ class CellService
         return $this->cells->get($id);
     }
 
+    public function deleteCell(Id $id)
+    {
+        $this->cells->remove($this->cells->get($id));
+    }
+
     public function getBaggage(Id $id): Baggage
     {
         return $this->baggies->get($id);

@@ -4,6 +4,7 @@
 namespace common\entities;
 
 
+use Assert\Assertion;
 use common\entities\events\BaggageLoadedEvent;
 use common\entities\events\BaggageUnloadedEvent;
 use common\entities\events\CellLockedEvent;
@@ -36,13 +37,16 @@ class Cell implements AggregateRoot
      * @param string $address
      * @param int $daysCount
      * @param int $price
+     * @throws \Assert\AssertionFailedException
      */
     public function __construct(Id $id, string $name, string $address, int $daysCount, int $price)
     {
+        Assertion::notEmpty($name, "Имя ячейки не должно быть пустым");
+        Assertion::notEmpty($address, "Адрес ячейки не должен быть пустым");
         $this->id = $id;
         $this->name = $name;
         $this->address = $address;
-        $this->status = CellStatus::Unlocked;
+        $this->status = CellStatus::Locked;
         $this->daysCount = $daysCount;
         $this->price = $price;
         $this->baggageId = null;
@@ -123,6 +127,7 @@ class Cell implements AggregateRoot
         return $this->status;
     }
 
+
     /**
      * @return string
      */
@@ -179,8 +184,13 @@ class Cell implements AggregateRoot
         return $this->status === CellStatus::Locked;
     }
 
+    public function isUnlocked(): bool
+    {
+        return $this->status === CellStatus::Unlocked;
+    }
+
     public function isBusy(): bool
     {
-        return $this->isLocked() || $this->isReserved();
+        return $this->isUnlocked() || $this->isReserved();
     }
 }
