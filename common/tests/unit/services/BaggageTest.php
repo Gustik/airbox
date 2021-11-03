@@ -46,12 +46,9 @@ class BaggageTest extends Unit
         $cell = $this->createCell();
         $cell = $this->cellService->reserveCell($cell);
 
-        $clientDto = new CreateClientDto();
-        $clientDto->phoneCountry = 7;
-        $clientDto->phoneCode = '920';
-        $clientDto->phoneNumber = '00000001';
+        $phone = '792000000001';
 
-        $this->cellService->loadBaggage($clientDto, $cell->getId(), $startDate = new DateTimeImmutable, $daysCount = 42);
+        $this->cellService->loadBaggage($phone, $cell->getId(), $startDate = new DateTimeImmutable, $daysCount = 42);
 
         $loadedCell = $this->cellService->getCell($cell->getId());
 
@@ -63,13 +60,8 @@ class BaggageTest extends Unit
         $baggage = $this->cellService->getBaggage($loadedCell->getBaggageId());
         $this->assertNotNull($baggage);
         $this->assertEquals($baggage->getStatus(), BaggageStatus::Loaded);
-        $this->assertNotNull($baggage->getClient());
+        $this->assertEquals($baggage->getPhone(), $phone);
 
-
-        $client = $baggage->getClient();
-        $this->assertEquals($client->getPhone()->getCountry(), $clientDto->phoneCountry);
-        $this->assertEquals($client->getPhone()->getCode(), $clientDto->phoneCode);
-        $this->assertEquals($client->getPhone()->getNumber(), $clientDto->phoneNumber);
 
         return $loadedCell;
     }

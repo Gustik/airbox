@@ -9,7 +9,7 @@ use common\entities\Id;
 use common\repositories\CellRepository;
 use common\repositories\NotFoundException;
 
-abstract class BaseRepositoryTest extends Unit
+abstract class BaseCellsRepositoryTest extends Unit
 {
     /**
      * @var CellRepository

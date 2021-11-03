@@ -59,14 +59,14 @@ class CellService
      *
      * Процедура загрузки багажа
      *
-     * @param CreateClientDto $clientDto
+     * @param string $phone
      * @param Id $cellId
      * @param DateTimeImmutable $startDate
      * @param int $daysCount
      * @return Cell
-     * @throws \Assert\AssertionFailedException
+     * @throws \Exception
      */
-    public function loadBaggage(CreateClientDto $clientDto, Id $cellId, DateTimeImmutable $startDate, int $daysCount): Cell
+    public function loadBaggage(string $phone, Id $cellId, DateTimeImmutable $startDate, int $daysCount): Cell
     {
         /*
         == Процедура загрузки багажа
@@ -84,11 +84,7 @@ class CellService
         $baggage = new Baggage (
             $baggageId = Id::next(),
             $baggageDate = new \DateTimeImmutable(),
-            $client = new Client(
-                $clientId = Id::next(),
-                $clientDate = new \DateTimeImmutable(),
-                $clientPhone = new Phone($clientDto->phoneCountry, $clientDto->phoneCode, $clientDto->phoneNumber),
-            )
+            $clientPhone = $phone
         );
         $this->baggies->add($baggage);
 
