@@ -145,11 +145,14 @@ switch ($_GET["method"])
 	break;
 	case "LIST":
 		$count=count($_conf);
+		$index=0;
 		echo "{\"cells\":[\n";
 		for ($i=0; $i<($count-1);$i++)
 		{
 			echo "{";
 			$state=get_cell($i);
+
+			echo "\"ID\":".$index.",";
 			if ($state["lock"])
 			{
 			echo "\"LOCKED\":1,";
@@ -164,9 +167,12 @@ switch ($_GET["method"])
 			echo "\"EMPTY\":0";
 			}
 			echo "},\n";
+			$index++;
 		}
 		echo "{";
 		$state=get_cell($count-1);
+
+		echo "\"ID\":".$index.",";
 		if ($state["lock"])
 		{
 		echo "\"LOCKED\":1,";
