@@ -4,7 +4,7 @@ use common\dispatchers\DummyDispatcher;
 use common\repositories\BaggageRepository;
 use common\repositories\CellRepository;
 use common\repositories\Hydrator;
-use common\repositories\MemoryBaggageRepository;
+use common\repositories\SqlBaggageRepository;
 use common\repositories\SqlCellsRepository;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use yii\di\Instance;
@@ -18,5 +18,5 @@ Yii::$container->setSingleton('db', function () {
     return Yii::$app->db;
 });
 Yii::$container->setSingleton(CellRepository::class, SqlCellsRepository::class, [Instance::of('db')]);
-Yii::$container->setSingleton(BaggageRepository::class, MemoryBaggageRepository::class);
+Yii::$container->setSingleton(BaggageRepository::class, SqlBaggageRepository::class, [Instance::of('db')]);
 Yii::$container->setSingleton(EventDispatcherInterface::class, DummyDispatcher::class);

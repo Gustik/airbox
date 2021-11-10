@@ -4,12 +4,10 @@
 namespace api\modules\v1\controllers;
 
 
-use Assert\AssertionFailedException;
 use common\entities\Cell;
 use common\entities\Id;
 use common\services\CellService;
 use common\services\dto\CreateCellDto;
-use common\services\dto\CreateClientDto;
 use DateTimeImmutable;
 
 class CellController extends \yii\rest\Controller
@@ -59,15 +57,18 @@ class CellController extends \yii\rest\Controller
         return ['status' => 200];
     }
 
+    /**
+     * @param $cellId
+     * @param $phone
+     * @param $days
+     * @return array
+     *
+     * Загрузить багаж в ячейку
+     */
     function actionLoad($cellId, $phone, $days)
     {
-        $clientDto = new CreateClientDto();
-        $clientDto->phoneCountry = substr($phone, 0, 1);
-        $clientDto->phoneCode = substr($phone, 1, 3);
-        $clientDto->phoneNumber = substr($phone, 3);
-
         try {
-            $cell = $this->cellService->loadBaggage($clientDto, new Id($cellId), new DateTimeImmutable, $days);
+            $cell = $this->cellService->loadBaggage($phone, new Id($cellId), new DateTimeImmutable, $days);
         } catch (\Exception $e) {
             return ['status'=>500, 'error' => $e->getMessage()];
         }
@@ -75,6 +76,11 @@ class CellController extends \yii\rest\Controller
         return ['status' => 200];
     }
 
+    /**
+     * @return array
+     *
+     * Список всех ячеек
+     */
     public function actionList()
     {
         return [ 'cells' => $this->cellService->cellListDto()];
