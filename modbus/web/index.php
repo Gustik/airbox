@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . '/mx200.php';
 $_conf = array(
 	//конфигурация ячейки    
 	//ip адрес МУ220, номер решистра, номер выхода замка, ip адреc МВ220, контакт замка, контакт датчика содержимого
-    array("ip1"=>"127.0.0.1","reg1"=>410,"pin1"=>1,	"ip2"=>"127.0.0.1","reg2"=>51,"pin2"=>1,"pin3"=>11), 
+    array("ip1"=>"192.168.10.58","reg1"=>410,"pin1"=>1,	"ip2"=>"192.168.10.58","reg2"=>51,"pin2"=>1,"pin3"=>11), 
     array("ip1"=>"127.0.0.1","reg1"=>410,"pin1"=>2,	"ip2"=>"127.0.0.1","reg2"=>51,"pin2"=>2,"pin3"=>12), 
     array("ip1"=>"127.0.0.1","reg1"=>410,"pin1"=>3,	"ip2"=>"127.0.0.1","reg2"=>51,"pin2"=>3,"pin3"=>13), 
     array("ip1"=>"127.0.0.1","reg1"=>410,"pin1"=>4,	"ip2"=>"127.0.0.1","reg2"=>51,"pin2"=>4,"pin3"=>14), 
@@ -145,11 +145,14 @@ switch ($_GET["method"])
 	break;
 	case "LIST":
 		$count=count($_conf);
+		$index=0;
 		echo "{\"cells\":[\n";
 		for ($i=0; $i<($count-1);$i++)
 		{
 			echo "{";
 			$state=get_cell($i);
+
+			echo "\"ID\":".$index.",";
 			if ($state["lock"])
 			{
 			echo "\"LOCKED\":1,";
@@ -164,9 +167,12 @@ switch ($_GET["method"])
 			echo "\"EMPTY\":0";
 			}
 			echo "},\n";
+			$index++;
 		}
 		echo "{";
 		$state=get_cell($count-1);
+
+		echo "\"ID\":".$index.",";
 		if ($state["lock"])
 		{
 		echo "\"LOCKED\":1,";
