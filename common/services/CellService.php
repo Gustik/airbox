@@ -91,7 +91,11 @@ class CellService
         $cell = $this->cells->get($cellId);
         if($cell->getStatus() !== CellStatus::Reserved) throw new \DomainException('Cell is not reserved');
 
-        $cell->loadBaggage($baggage->getId(), $startDate, $daysCount);
+        if(CabinetService::openCell($cell->getId()->toString())) {
+            $cell->loadBaggage($baggage->getId(), $startDate, $daysCount);
+        } else {
+            throw new \DomainException('Cell is not opened');
+        }
 
         $this->cells->save($cell);
 

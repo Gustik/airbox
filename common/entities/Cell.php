@@ -57,7 +57,7 @@ class Cell implements AggregateRoot
     public function dto(): CreateCellDto
     {
         $dto = new CreateCellDto();
-        $dto->cellId = $this->getId()->getId();
+        $dto->cellId = $this->getId()->toString();
         $dto->cellName = $this->getName();
         $dto->cellAddress = $this->getAddress();
         $dto->price = $this->getPrice();
@@ -78,6 +78,7 @@ class Cell implements AggregateRoot
         $this->startDate = $startDate;
         $this->daysCount = $daysCount;
         $this->pinCode = uniqid();
+        $this->status = CellStatus::Unlocked;
 
         $this->recordEvent(new BaggageLoadedEvent($this->id, $this->pinCode));
 
@@ -96,7 +97,7 @@ class Cell implements AggregateRoot
 
     public function isBaggageLoaded(): bool
     {
-        return $this->baggageId ? true : false;
+        return (bool)$this->baggageId;
     }
 
     public function getStartDate(): ?DateTimeImmutable

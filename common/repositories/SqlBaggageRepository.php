@@ -27,7 +27,7 @@ class SqlBaggageRepository implements BaggageRepository
     {
         $baggage = (new Query())->select('*')
             ->from('{{%baggage}}')
-            ->andWhere(['id' => $id->getId()])
+            ->andWhere(['id' => $id->toString()])
             ->one($this->db);
 
         if (!$baggage) {
@@ -76,7 +76,7 @@ class SqlBaggageRepository implements BaggageRepository
                 ->update(
                     '{{%baggage}}',
                     self::extractBaggageData($baggage),
-                    ['id' => $baggage->getId()->getId()]
+                    ['id' => $baggage->getId()->toString()]
                 )->execute();
         });
     }
@@ -88,7 +88,7 @@ class SqlBaggageRepository implements BaggageRepository
     public function remove(Baggage $baggage): void
     {
         $this->db->createCommand()
-            ->delete('{{%baggage}}', ['id' => $baggage->getId()->getId()])
+            ->delete('{{%baggage}}', ['id' => $baggage->getId()->toString()])
             ->execute();
     }
 
@@ -100,7 +100,7 @@ class SqlBaggageRepository implements BaggageRepository
     {
 
         return [
-            'id' => $baggage->getId()->getId(),
+            'id' => $baggage->getId()->toString(),
             'phone' => $baggage->getPhone(),
             'status' => $baggage->getStatus(),
             'date' => $baggage->getDate() ? $baggage->getDate()->format('Y-m-d H:i:s') : null,

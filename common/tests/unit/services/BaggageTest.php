@@ -56,6 +56,7 @@ class BaggageTest extends Unit
         $this->assertNotNull($loadedCell->getPinCode());
         $this->assertEquals($loadedCell->getStartDate(), $startDate);
         $this->assertEquals($loadedCell->getDaysCount(), $daysCount);
+        $this->assertEquals($loadedCell->getStatus(), CellStatus::Unlocked);
 
         $baggage = $this->cellService->getBaggage($loadedCell->getBaggageId());
         $this->assertNotNull($baggage);

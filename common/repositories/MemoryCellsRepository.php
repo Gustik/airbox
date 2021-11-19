@@ -15,26 +15,26 @@ class MemoryCellsRepository implements CellRepository
 
     public function get(Id $id): Cell
     {
-        if (!isset($this->items[$id->getId()])) {
+        if (!isset($this->items[$id->toString()])) {
             throw new NotFoundException('Cell not found.');
         }
-        return clone $this->items[$id->getId()];
+        return clone $this->items[$id->toString()];
     }
 
     public function add(Cell $cell): void
     {
-        $this->items[$cell->getId()->getId()] = $cell;
+        $this->items[$cell->getId()->toString()] = $cell;
     }
 
     public function save(Cell $cell): void
     {
-        $this->items[$cell->getId()->getId()] = $cell;
+        $this->items[$cell->getId()->toString()] = $cell;
     }
 
     public function remove(Cell $cell): void
     {
-        if ($this->items[$cell->getId()->getId()]) {
-            unset($this->items[$cell->getId()->getId()]);
+        if ($this->items[$cell->getId()->toString()]) {
+            unset($this->items[$cell->getId()->toString()]);
         }
     }
 }
