@@ -49,7 +49,7 @@ class CellController extends \yii\rest\Controller
      * Зарезервировать ячейку
      * @return array
      */
-    function actionReserve($cellId)
+    function actionReserve($cellId): array
     {
         $cell = $this->cellService->getCell(new Id($cellId));
         $this->cellService->reserveCell($cell);
@@ -65,7 +65,7 @@ class CellController extends \yii\rest\Controller
      *
      * Загрузить багаж в ячейку
      */
-    function actionLoad($cellId, $phone, $days)
+    function actionLoad($cellId, $phone, $days): array
     {
         try {
             $cell = $this->cellService->loadBaggage($phone, new Id($cellId), new DateTimeImmutable, $days);
@@ -81,7 +81,7 @@ class CellController extends \yii\rest\Controller
      *
      * Список всех ячеек
      */
-    public function actionList()
+    public function actionList(): array
     {
         return [ 'cells' => $this->cellService->cellListDto()];
     }

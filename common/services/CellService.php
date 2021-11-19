@@ -169,6 +169,7 @@ class CellService
             throw new \DomainException('Cell is all ready reserved.');
         }
         $cell->reserve();
+        $this->cells->save($cell);
         foreach ($cell->releaseEvents() as $event) {
             $this->dispatcher->dispatch($event);
         }

@@ -91,7 +91,8 @@ class BaggageTest extends Unit
     public function testReserveCell(): void
     {
         $cell = $this->createCell();
-        $cell = $this->cellService->reserveCell($cell);
+        $this->cellService->reserveCell($cell);
+        $cell = $this->cellService->getCell($cell->getId());
         $this->assertEquals($cell->getStatus(), CellStatus::Reserved);
     }
 
