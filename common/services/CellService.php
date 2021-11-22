@@ -187,7 +187,7 @@ class CellService
 
         foreach ($this->cells->all() as $cell) {
             $cellDto = new CreateCellDto();
-            $cellDto->cellId = $cell->getId()->getId();
+            $cellDto->cellId = $cell->getId()->toString();
             $cellDto->cellName = $cell->getName();
             $cellDto->cellAddress = $cell->getAddress();
             $cellDto->status = $cell->getStatus();
