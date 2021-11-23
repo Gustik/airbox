@@ -41,9 +41,15 @@ class CellController extends \yii\web\Controller
     public function actionView($id)
     {
         $cell = $this->cellService->getCell(new Id($id));
+        $baggage = null;
+
+        if($cell->isBaggageLoaded()) {
+            $baggage = $this->cellService->getBaggage($cell->getBaggageId());
+        }
 
         return $this->render('view', [
-            'cell' => $cell->dto()
+            'cell' => $cell->dto(),
+            'baggage' => $baggage,
         ]);
     }
 
