@@ -54,6 +54,7 @@ class CellService
     {
         $cell = $this->cells->get($id);
         if($cell->isBaggageLoaded()) {
+            $cell->unloadBaggage();
             $cell->lock();
             $this->cells->save($cell);
             $baggage = $this->baggies->get($cell->getBaggageId());
