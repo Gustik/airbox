@@ -53,4 +53,11 @@ class CellController extends \yii\web\Controller
 
         return $this->redirect(['index']);
     }
+
+    public function actionRelease($id)
+    {
+        $this->cellService->releaseCell(new Id($id));
+
+        return $this->redirect(['index']);
+    }
 }

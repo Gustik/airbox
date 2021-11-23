@@ -22,6 +22,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+
+        <?= Html::a('Освободить', ['release', 'id' => $cell->cellId], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => 'Вы уверены что хотите освободить эту ячейку?',
+                'method' => 'post',
+            ],
+        ]) ?>
     </p>
     <div>
         Номер ячейки: <?=$cell->cellName?><br>

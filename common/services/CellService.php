@@ -50,6 +50,16 @@ class CellService
         $this->cells->remove($this->cells->get($id));
     }
 
+    public function releaseCell(Id $id)
+    {
+        $cell = $this->cells->get($id);
+        if($cell->isBaggageLoaded()) {
+            $cell->lock();
+            $baggage = $this->baggies->get($cell->getBaggageId());
+            $this->baggies->remove($baggage);
+        }
+    }
+
     public function getBaggage(Id $id): Baggage
     {
         return $this->baggies->get($id);
