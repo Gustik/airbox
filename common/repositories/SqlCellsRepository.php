@@ -26,7 +26,7 @@ class SqlCellsRepository implements CellRepository
     {
         $cell = (new Query())->select('*')
             ->from('{{%cell}}')
-            ->andWhere(['id' => $id->getId()])
+            ->andWhere(['id' => $id->toString()])
             ->one($this->db);
 
         if (!$cell) {
@@ -75,7 +75,7 @@ class SqlCellsRepository implements CellRepository
                 ->update(
                     '{{%cell}}',
                     self::extractCellData($cell),
-                    ['id' => $cell->getId()->getId()]
+                    ['id' => $cell->getId()->toString()]
                 )->execute();
         });
     }
@@ -87,7 +87,7 @@ class SqlCellsRepository implements CellRepository
     public function remove(Cell $cell): void
     {
         $this->db->createCommand()
-            ->delete('{{%cell}}', ['id' => $cell->getId()->getId()])
+            ->delete('{{%cell}}', ['id' => $cell->getId()->toString()])
             ->execute();
     }
 
@@ -99,11 +99,11 @@ class SqlCellsRepository implements CellRepository
     {
 
         return [
-            'id' => $cell->getId()->getId(),
+            'id' => $cell->getId()->toString(),
             'name' => $cell->getName(),
             'address' => $cell->getAddress(),
             'status' => $cell->getStatus(),
-            'baggageId' => $cell->getBaggageId() ? $cell->getBaggageId()->getId() : null,
+            'baggageId' => $cell->getBaggageId() ? $cell->getBaggageId()->toString() : null,
             'startDate' => $cell->getStartDate() ? $cell->getStartDate()->format('Y-m-d H:i:s') : null,
             'daysCount' => $cell->getDaysCount(),
             'price' => $cell->getPrice(),

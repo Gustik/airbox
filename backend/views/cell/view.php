@@ -5,6 +5,7 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $cell \common\services\dto\CreateCellDto */
+/* @var $baggage \common\entities\Baggage */
 
 $this->title = 'Ячейка №' . $cell->cellName;
 $this->params['breadcrumbs'][] = ['label' => 'Ячейки', 'url' => ['index']];
@@ -36,6 +37,14 @@ $this->params['breadcrumbs'][] = $this->title;
         Адрес ячейки: <?=$cell->cellAddress?><br>
         Статус: <?=\common\entities\CellStatus::name($cell->status)?><br>
         Цена: <?=$cell->price?><br>
+        <?php if($baggage): ?>
+        <div>
+            <h4>Загружен багаж</h4>
+            Дата и время загрузки: <?=$baggage->getDate()->format('Y-m-d H:i:s')?><br>
+            Количество суток: <?=$cell->daysCount?><br>
+            Телефон: +<?=$baggage->getPhone()?><br>
+        </div>
+        <?php endif ?>
     </div>
 
 </div>

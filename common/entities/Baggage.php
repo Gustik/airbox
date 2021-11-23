@@ -12,20 +12,20 @@ class Baggage implements AggregateRoot
 
     private Id $id;
     private DateTimeImmutable $date;
-    private Client $client;
     private int $status;
+    private string $phone;
 
     /**
      * Baggage constructor.
      * @param Id $id
      * @param DateTimeImmutable $date
-     * @param Client $client
+     * @param string $phone
      */
-    public function __construct(Id $id, DateTimeImmutable $date, Client $client)
+    public function __construct(Id $id, DateTimeImmutable $date, string $phone)
     {
         $this->id = $id;
         $this->date = $date;
-        $this->client = $client;
+        $this->phone = $phone;
         $this->status = BaggageStatus::Loaded;
     }
 
@@ -44,14 +44,19 @@ class Baggage implements AggregateRoot
         return $this->date;
     }
 
-    public function getClient(): Client
+    public function getPhone(): string
     {
-        return $this->client;
+        return $this->phone;
     }
 
     public function unload(): void
     {
         $this->status = BaggageStatus::Unloaded;
+    }
+
+    public function isUnloaded(): bool
+    {
+        return $this->status === BaggageStatus::Unloaded;
     }
 
 }

@@ -46,12 +46,9 @@ class BaggageTest extends Unit
         $cell = $this->createCell();
         $cell = $this->cellService->reserveCell($cell);
 
-        $clientDto = new CreateClientDto();
-        $clientDto->phoneCountry = 7;
-        $clientDto->phoneCode = '920';
-        $clientDto->phoneNumber = '00000001';
+        $phone = '792000000001';
 
-        $this->cellService->loadBaggage($clientDto, $cell->getId(), $startDate = new DateTimeImmutable, $daysCount = 42);
+        $this->cellService->loadBaggage($phone, $cell->getId(), $startDate = new DateTimeImmutable, $daysCount = 42);
 
         $loadedCell = $this->cellService->getCell($cell->getId());
 
@@ -59,17 +56,13 @@ class BaggageTest extends Unit
         $this->assertNotNull($loadedCell->getPinCode());
         $this->assertEquals($loadedCell->getStartDate(), $startDate);
         $this->assertEquals($loadedCell->getDaysCount(), $daysCount);
+        $this->assertEquals($loadedCell->getStatus(), CellStatus::Unlocked);
 
         $baggage = $this->cellService->getBaggage($loadedCell->getBaggageId());
         $this->assertNotNull($baggage);
         $this->assertEquals($baggage->getStatus(), BaggageStatus::Loaded);
-        $this->assertNotNull($baggage->getClient());
+        $this->assertEquals($baggage->getPhone(), $phone);
 
-
-        $client = $baggage->getClient();
-        $this->assertEquals($client->getPhone()->getCountry(), $clientDto->phoneCountry);
-        $this->assertEquals($client->getPhone()->getCode(), $clientDto->phoneCode);
-        $this->assertEquals($client->getPhone()->getNumber(), $clientDto->phoneNumber);
 
         return $loadedCell;
     }
@@ -99,7 +92,8 @@ class BaggageTest extends Unit
     public function testReserveCell(): void
     {
         $cell = $this->createCell();
-        $cell = $this->cellService->reserveCell($cell);
+        $this->cellService->reserveCell($cell);
+        $cell = $this->cellService->getCell($cell->getId());
         $this->assertEquals($cell->getStatus(), CellStatus::Reserved);
     }
 

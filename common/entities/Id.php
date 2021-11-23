@@ -23,13 +23,13 @@ class Id
         return new self(Uuid::uuid4()->toString());
     }
 
-    public function getId(): string
+    public function toString(): string
     {
         return $this->id;
     }
 
     public function isEqualTo(self $other): bool
     {
-        return $this->getId() === $other->getId();
+        return $this->toString() === $other->toString();
     }
 }

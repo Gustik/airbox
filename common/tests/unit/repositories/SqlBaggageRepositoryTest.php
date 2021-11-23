@@ -4,11 +4,11 @@ namespace common\tests\unit\repositories;
 
 
 use common\repositories\Hydrator;
-use common\repositories\SqlCellsRepository;
-use common\tests\_fixtures\CellFixture;
+use common\repositories\SqlBaggageRepository;
+use common\tests\_fixtures\BaggageFixture;
 
 
-class SqlCellsRepositoryTest extends BaseCellsRepositoryTest
+class SqlBaggageRepositoryTest extends BaseBaggageRepositoryTest
 {
     /**
      * @var \common\tests\UnitTester
@@ -18,10 +18,10 @@ class SqlCellsRepositoryTest extends BaseCellsRepositoryTest
     public function _before()
     {
         $this->tester->haveFixtures([
-            'cell' => CellFixture::class,
+            'baggage' => BaggageFixture::class,
         ]);
 
-        $this->repository = new SqlCellsRepository(
+        $this->repository = new SqlBaggageRepository(
             \Yii::$app->db,
             new Hydrator(),
         );

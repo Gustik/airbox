@@ -69,14 +69,14 @@ class CellService
      *
      * Процедура загрузки багажа
      *
-     * @param CreateClientDto $clientDto
+     * @param string $phone
      * @param Id $cellId
      * @param DateTimeImmutable $startDate
      * @param int $daysCount
      * @return Cell
-     * @throws \Assert\AssertionFailedException
+     * @throws \Exception
      */
-    public function loadBaggage(CreateClientDto $clientDto, Id $cellId, DateTimeImmutable $startDate, int $daysCount): Cell
+    public function loadBaggage(string $phone, Id $cellId, DateTimeImmutable $startDate, int $daysCount): Cell
     {
         /*
         == Процедура загрузки багажа
@@ -94,18 +94,18 @@ class CellService
         $baggage = new Baggage (
             $baggageId = Id::next(),
             $baggageDate = new \DateTimeImmutable(),
-            $client = new Client(
-                $clientId = Id::next(),
-                $clientDate = new \DateTimeImmutable(),
-                $clientPhone = new Phone($clientDto->phoneCountry, $clientDto->phoneCode, $clientDto->phoneNumber),
-            )
+            $clientPhone = $phone
         );
         $this->baggies->add($baggage);
 
         $cell = $this->cells->get($cellId);
         if($cell->getStatus() !== CellStatus::Reserved) throw new \DomainException('Cell is not reserved');
 
-        $cell->loadBaggage($baggage->getId(), $startDate, $daysCount);
+        if(CabinetService::openCell($cell->getId()->toString())) {
+            $cell->loadBaggage($baggage->getId(), $startDate, $daysCount);
+        } else {
+            throw new \DomainException('Cell is not opened');
+        }
 
         $this->cells->save($cell);
 
@@ -183,6 +183,7 @@ class CellService
             throw new \DomainException('Cell is all ready reserved.');
         }
         $cell->reserve();
+        $this->cells->save($cell);
         foreach ($cell->releaseEvents() as $event) {
             $this->dispatcher->dispatch($event);
         }
@@ -196,7 +197,7 @@ class CellService
 
         foreach ($this->cells->all() as $cell) {
             $cellDto = new CreateCellDto();
-            $cellDto->cellId = $cell->getId()->getId();
+            $cellDto->cellId = $cell->getId()->toString();
             $cellDto->cellName = $cell->getName();
             $cellDto->cellAddress = $cell->getAddress();
             $cellDto->status = $cell->getStatus();
