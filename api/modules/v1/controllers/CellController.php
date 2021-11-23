@@ -32,17 +32,6 @@ class CellController extends \yii\rest\Controller
         ];
     }
 
-    private function createCell($name, $address): Cell
-    {
-        $createCellDto = new CreateCellDto();
-        $createCellDto->cellName = $name;
-        $createCellDto->cellAddress = $address;
-        $createCellDto->daysCount = 2;
-        $createCellDto->price = 100;
-
-        return $this->cellService->createCell($createCellDto);
-    }
-
     /**
      * @param $cellId
      *
@@ -70,7 +59,7 @@ class CellController extends \yii\rest\Controller
         try {
             $cell = $this->cellService->loadBaggage($phone, new Id($cellId), new DateTimeImmutable, $days);
         } catch (\Exception $e) {
-            return ['status'=>500, 'error' => $e->getMessage()];
+            return ['status'=>500, 'message' => $e->getMessage()];
         }
 
         return ['status' => 200];
